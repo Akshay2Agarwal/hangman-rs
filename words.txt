@@ -1,0 +1,10 @@
+apple
+lemon
+orange
+tomato
+zucchini
+spinach
+potato
+aspharagus
+banana
+avocado
