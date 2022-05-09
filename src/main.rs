@@ -17,6 +17,10 @@ trait CheckLetter {
     fn check_for_letter(&mut self, c: char) -> bool;
 }
 
+trait CheckWord {
+    fn check_for_word(&mut self, inp_word: String) -> bool;
+}
+
 trait CheckComplete {
     fn check_complete(&self) -> bool;
 }
@@ -24,6 +28,16 @@ trait CheckComplete {
 impl CheckComplete for Word {
     fn check_complete(&self) -> bool {
         self.correct_count == self.length
+    }
+}
+
+impl CheckWord for Word {
+    fn check_for_word(&mut self, inp_word: String) -> bool {
+        if inp_word.eq(&self.answer) {
+            true
+        } else {
+            false
+        }
     }
 }
 
@@ -96,18 +110,31 @@ fn main() {
     let mut input_ch: char;
     let mut body_comp = false;
     while !select_word.check_complete() && !body_comp {
-        println!("Pls enter a char");
+        println!("Pls enter a char or complete word");
         let mut input_str = String::new();
         match io::stdin().read_line(&mut input_str) {
             Ok(_) => {
-                input_ch = input_str.chars().nth(0).unwrap();
-                if select_word.check_for_letter(input_ch) {
-                    println!("Found the letter {}, word now is {}", input_ch, select_word.representation);
+                if input_str.trim().len() > 1 {
+                    if select_word.check_for_word(input_str.trim().to_string()) {
+                        select_word.representation = String::from_iter(select_word.answer.chars());
+                        select_word.correct_count = select_word.length;
+                    } else {
+                        let next_part = body_iter.next().unwrap();
+                        println!("Wrong answer, next part is {}", next_part);
+                        if next_part == "right_foot" {
+                            body_comp = true;
+                        }
+                    }
                 } else {
-                    let next_part = body_iter.next().unwrap();
-                    println!("Wrong answer, next part is {}", next_part);
-                    if next_part == "right_foot" {
-                        body_comp = true;
+                    input_ch = input_str.chars().nth(0).unwrap();
+                    if select_word.check_for_letter(input_ch) {
+                        println!("Found the letter {}, word now is {}", input_ch, select_word.representation);
+                    } else {
+                        let next_part = body_iter.next().unwrap();
+                        println!("Wrong answer, next part is {}", next_part);
+                        if next_part == "right_foot" {
+                            body_comp = true;
+                        }
                     }
                 }
             }
